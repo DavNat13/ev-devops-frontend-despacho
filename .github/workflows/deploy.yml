@@ -25,8 +25,7 @@ jobs:
       - name: Build y Push a ECR
         run: |
           docker build \
-            --build-arg VITE_API_DESPACHOS_URL=http://${{ secrets.BACKEND_PRIVATE_IP }}:8081 \
-            --build-arg VITE_API_VENTAS_URL=http://${{ secrets.BACKEND_PRIVATE_IP }}:8082 \
+            --build-arg BACKEND_PRIVATE_IP=${{ secrets.BACKEND_PRIVATE_IP }} \
             -t frontend-despacho .
             
           docker tag frontend-despacho:latest ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
@@ -37,7 +36,7 @@ jobs:
           aws ssm send-command \
             --instance-ids ${{ secrets.EC2_FRONTEND_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
-            --comment "Actualizando Frontend" \
+            --comment "Actualizando Frontend con Reverse Proxy" \
             --parameters '{"commands":[
               "cd /home/ec2-user/app",
               "echo ECR_REPO_URL_FRONTEND=${{ secrets.ECR_REPO_URL_FRONTEND }} > .env",
