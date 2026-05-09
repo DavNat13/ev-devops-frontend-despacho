@@ -24,18 +24,23 @@ jobs:
 
       - name: Build y Push a ECR
         run: |
-          docker build -t frontend-despacho .
+          docker build \
+            --build-arg VITE_API_DESPACHOS_URL=http://${{ secrets.BACKEND_PRIVATE_IP }}:8081 \
+            --build-arg VITE_API_VENTAS_URL=http://${{ secrets.BACKEND_PRIVATE_IP }}:8082 \
+            -t frontend-despacho .
+            
           docker tag frontend-despacho:latest ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
           docker push ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
 
-      - name: Despliegue en EC2 vía SSM y Docker Compose
+      - name: Despliegue en EC2 vía SSM
         run: |
           aws ssm send-command \
             --instance-ids ${{ secrets.EC2_FRONTEND_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
-            --comment "Actualizando Frontend con Docker Compose" \
+            --comment "Actualizando Frontend" \
             --parameters '{"commands":[
               "cd /home/ec2-user/app",
+              "echo ECR_REPO_URL_FRONTEND=${{ secrets.ECR_REPO_URL_FRONTEND }} > .env",
               "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
               "docker compose pull frontend-despacho",
               "docker compose up -d frontend-despacho"

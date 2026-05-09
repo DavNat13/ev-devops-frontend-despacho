@@ -16,14 +16,14 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
 
     try {
       await axios.put(
-        `http://192.168.320/api/v1/despachos/${despacho.idDespacho}`,
+        `${import.meta.env.VITE_API_DESPACHOS_URL}/api/v1/despachos/${despacho.idDespacho}`,
         jsonData,
         {
-          headers:{
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-      }
-        }
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        },
       );
       Swal.fire({
         title: "Despacho modificado 🛻!",
@@ -41,8 +41,7 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
     <>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col justify-center text-center px-24 text-xl"
-      >
+        className="flex flex-col justify-center text-center px-24 text-xl">
         <div className="mx-auto text-3xl font-bold mb-10 text-teal-600">
           Editar y cierre de despacho
         </div>
@@ -89,8 +88,7 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
           <select
             defaultValue={false}
             className="border border-gray-300 rounded-lg block w-full  p-1"
-            {...register("despachado", { required: true })}
-          >
+            {...register("despachado", { required: true })}>
             <option value={false}>Despacho abierto</option>
             <option value={true}>Cerrar despacho</option>
           </select>
@@ -125,8 +123,7 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
 
         <button
           className="py-6 px-14 rounded-lg bg-teal-600 text-white font-bold mb-14"
-          type="submit"
-        >
+          type="submit">
           Modificar Despacho
         </button>
       </form>
